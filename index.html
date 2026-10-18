@@ -2,95 +2,641 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#10251c">
-  <title>Arborist Intelligence</title>
-  <style>
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f4f5ef;
-      color: #20372b;
-    }
-    header {
-      background: #10251c;
-      color: white;
-      text-align: center;
-      padding: 38px 18px;
-    }
-    header .tree { font-size: 42px; }
-    h1 { margin: 12px 0; font-size: 30px; }
-    header p { color: #d5e2d5; line-height: 1.6; }
-    main { max-width: 850px; margin: auto; padding: 24px 16px; }
-    .intro { text-align: center; line-height: 1.7; }
-    .cards {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 14px;
-      margin-top: 24px;
-    }
-    .card {
-      background: white;
-      padding: 20px;
-      border-radius: 12px;
-      border: 1px solid #dce4d9;
-    }
-    .card h2 { font-size: 19px; margin-top: 0; }
-    .card p { line-height: 1.6; color: #526258; }
-    footer {
-      text-align: center;
-      padding: 24px;
-      background: #10251c;
-      color: #d5e2d5;
-      font-size: 14px;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Arborist Intelligence</title>
+<style>
+:root {
+  --forest:#214735;
+  --leaf:#39704f;
+  --gold:#d9b86c;
+  --paper:#f4f5ef;
+  --ink:#243128;
+  --muted:#69776d;
+  --line:#dce3d9;
+}
+* { box-sizing:border-box; }
+body {
+  margin:0;
+  background:var(--paper);
+  color:var(--ink);
+  font-family:Arial,sans-serif;
+  line-height:1.6;
+}
+header {
+  background:var(--forest);
+  color:white;
+  padding:26px 18px;
+  border-bottom:4px solid var(--gold);
+}
+.wrap { max-width:900px; width:calc(100% - 28px); margin:auto; }
+.brand { color:var(--gold); font-size:12px; letter-spacing:2px; font-weight:bold; }
+h1 { font-size:clamp(28px,7vw,42px); line-height:1.2; margin:8px 0; }
+header p { color:#e1e9e2; margin:0; }
+main { padding:22px 0 40px; }
+h2 { font-size:24px; line-height:1.3; margin:8px 0; }
+h3 { font-size:18px; margin:0 0 6px; }
+p { margin:8px 0 12px; }
+.muted { color:var(--muted); font-size:14px; }
+.card {
+  background:white;
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:16px;
+  margin:12px 0;
+  min-width:0;
+}
+label { display:block; font-weight:bold; font-size:14px; margin:10px 0 5px; }
+input,select,textarea {
+  width:100%;
+  border:1px solid #bdc9be;
+  border-radius:9px;
+  padding:12px;
+  background:white;
+  color:var(--ink);
+  font:inherit;
+}
+button {
+  font:inherit;
+  font-weight:bold;
+  border:0;
+  border-radius:9px;
+  padding:11px 15px;
+  cursor:pointer;
+}
+.primary { background:var(--leaf); color:white; }
+.secondary { background:#e8eee7; color:var(--forest); }
+.actions { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
+nav {
+  display:flex;
+  gap:7px;
+  overflow-x:auto;
+  padding:15px 0;
+}
+nav button {
+  flex:0 0 auto;
+  font-size:13px;
+  background:white;
+  color:var(--forest);
+  border:1px solid var(--line);
+}
+nav button.active { background:var(--forest); color:white; }
+.panel { display:none; }
+.panel.active { display:block; }
+.grid { display:grid; grid-template-columns:1fr; gap:12px; }
+.result {
+  background:white;
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:15px;
+}
+.result h3 { color:var(--forest); }
+.tag {
+  display:inline-block;
+  border-radius:20px;
+  background:#e8eee7;
+  color:var(--forest);
+  font-size:12px;
+  padding:3px 9px;
+  margin:3px 3px 5px 0;
+}
+.notice {
+  background:#fff4dd;
+  border-left:4px solid var(--gold);
+  padding:12px;
+  border-radius:5px;
+  font-size:14px;
+  margin:12px 0;
+}
+#photoPreview {
+  display:none;
+  max-width:100%;
+  max-height:320px;
+  object-fit:contain;
+  margin-top:12px;
+  border-radius:10px;
+}
+ul { padding-left:21px; }
+li { margin:5px 0; }
+footer {
+  background:#e7ece5;
+  text-align:center;
+  padding:20px;
+  color:var(--muted);
+  font-size:12px;
+}
+button:focus-visible,input:focus-visible,select:focus-visible {
+  outline:3px solid var(--gold);
+  outline-offset:2px;
+}
+@media(min-width:620px) {
+  .grid { grid-template-columns:1fr 1fr; }
+}
+</style>
 </head>
 <body>
-  <header>
-    <div class="tree">🌳</div>
-    <h1>Arborist Intelligence</h1>
-    <p>Smarter Tree Care. Safer Arborists. Stronger Knowledge.</p>
-  </header>
+<header>
+  <div class="wrap">
+    <div class="brand">FIELD KNOWLEDGE · BETTER PRACTICE</div>
+    <h1>🌳 Arborist Intelligence</h1>
+    <p>Identify the tree. Investigate the problem. Protect the future.</p>
+  </div>
+</header>
 
-  <main>
-    <section class="intro">
-      <h2>Welcome to the Canopy</h2>
-      <p>A growing knowledge hub for arborists, tree climbers, and everyone who cares for trees. Learn, build your skills, and work more safely.</p>
-    </section>
+<main class="wrap">
+  <section class="card">
+    <h2>Intelligence Search</h2>
+    <p class="muted">Search tree species, pests, diseases, symptoms and arboricultural topics.</p>
+    <label for="search">What do you need to know?</label>
+    <input id="search" type="search"
+      placeholder="e.g. oak, yellow leaves, root rot..."
+      autocomplete="off">
+    <div class="actions">
+      <button class="primary" onclick="runSearch()">Search library</button>
+      <button class="secondary" onclick="clearSearch()">Clear</button>
+    </div>
+    <div id="searchStatus" class="muted" aria-live="polite"></div>
+  </section>
 
-    <section class="cards">
-      <article class="card">
-        <h2>🌿 Tree Intelligence</h2>
-        <p>Explore tree identification, botany, soils, growth patterns, pruning, pests, and diseases.</p>
-      </article>
-      <article class="card">
-        <h2>🧗 Climbing & Rigging</h2>
-        <p>Build your knowledge of climbing systems, rigging principles, equipment, and safe work practices.</p>
-      </article>
-      <article class="card">
-        <h2>🪚 Tools & Equipment</h2>
-        <p>Learn about chainsaw care, sharpening, rope maintenance, and looking after your gear.</p>
-      </article>
-      <article class="card">
-        <h2>📚 StudyMate</h2>
-        <p>Understand arboriculture concepts and assessment questions with clear, practical explanations.</p>
-      </article>
-      <article class="card">
-        <h2>🛡️ Safety & Wellbeing</h2>
-        <p>Explore risk awareness, injury prevention, body care, and safer working habits.</p>
-      </article>
-      <article class="card">
-        <h2>🌍 The Canopy Community</h2>
-        <p>A future space for arborists to share knowledge, experiences, and lessons from the field.</p>
-      </article>
-    </section>
-  </main>
+  <nav aria-label="Main sections">
+    <button class="active" data-tab="library">🌿 Tree Library</button>
+    <button data-tab="identify">📷 AI Photo Tool</button>
+    <button data-tab="pests">🐛 Pests & Diseases</button>
+    <button data-tab="practice">🪚 Arborist Guides</button>
+  </nav>
 
-  <footer>
-    Arborist Intelligence · Protect the tree. Protect the climber. Keep learning.
-  </footer>
+  <section id="library" class="panel active">
+    <h2>Tree Intelligence Library</h2>
+    <p>Explore sample profiles. The global library will grow towards 1,000 species.</p>
+    <div id="results" class="grid"></div>
+    <div id="detail"></div>
+  </section>
+
+  <section id="identify" class="panel">
+    <h2>AI-Assisted Tree Identification</h2>
+    <p>Upload a photo to preview it and prepare an assessment.</p>
+    <div class="card">
+      <label for="photo">Choose a tree, leaf, bark or symptom photo</label>
+      <input id="photo" type="file" accept="image/*">
+      <img id="photoPreview" alt="Preview of your selected photograph">
+      <label for="photoType">What are you photographing?</label>
+      <select id="photoType">
+        <option value="tree">Whole tree</option>
+        <option value="leaf">Leaf or needle</option>
+        <option value="bark">Bark or trunk</option>
+        <option value="flower">Flower, fruit or seed</option>
+        <option value="symptoms">Pest, disease or damaged area</option>
+      </select>
+      <label for="location">Where is the tree growing?</label>
+      <input id="location" placeholder="e.g. Canterbury, New Zealand">
+      <label for="symptoms">What have you noticed?</label>
+      <textarea id="symptoms" rows="3"
+        placeholder="e.g. brown leaf spots, wilting, holes in bark..."></textarea>
+      <div class="actions">
+        <button class="primary" onclick="prepareAssessment()">Prepare assessment</button>
+        <button class="secondary" onclick="clearPhoto()">Remove photo</button>
+      </div>
+      <div id="photoStatus" aria-live="polite"></div>
+    </div>
+    <div class="notice">
+      <strong>AI connection not yet enabled.</strong> This prototype previews your photo and collects assessment details, but it does not yet analyse images or diagnose trees. We will connect a real AI service securely in a later step.
+    </div>
+    <div class="card">
+      <h3>Tips for useful photographs</h3>
+      <ul>
+        <li>Photograph the whole tree and its growing environment.</li>
+        <li>Take clear close-ups of both sides of affected leaves.</li>
+        <li>Include bark, branches, flowers or fruit when available.</li>
+        <li>Photograph the boundary between healthy and affected tissue.</li>
+        <li>Record location, season and when symptoms first appeared.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="pests" class="panel">
+    <h2>Pests & Diseases</h2>
+    <p>Search for symptoms below to explore possible explanations.</p>
+    <div id="problemResults" class="grid"></div>
+    <div class="notice">
+      Similar symptoms can have different causes. These entries are educational starting points, not confirmed diagnoses.
+    </div>
+  </section>
+
+  <section id="practice" class="panel">
+    <h2>Arborist Field Guides</h2>
+    <div class="grid">
+      <article class="result">
+        <h3>Pruning principles</h3>
+        <p>Identify the branch collar and bark ridge. Plan cuts to preserve branch attachment and minimise unnecessary wounds. Avoid indiscriminate topping.</p>
+        <span class="tag">Tree care</span>
+      </article>
+      <article class="result">
+        <h3>Tree health assessment</h3>
+        <p>Record crown condition, deadwood, cavities, cracks, fungal growth, root-zone disturbance and site conditions. Symptoms alone do not prove a tree is dangerous.</p>
+        <span class="tag">Inspection</span>
+      </article>
+      <article class="result">
+        <h3>Climbing & rigging</h3>
+        <p>Assess anchors, equipment, loads, communication, exclusion zones and rescue arrangements. Complex work needs a competent, site-specific plan.</p>
+        <span class="tag">Work planning</span>
+      </article>
+      <article class="result">
+        <h3>Equipment maintenance</h3>
+        <p>Follow manufacturer instructions for inspection, cleaning, storage and retirement. Quarantine damaged climbing equipment and defective safety devices.</p>
+        <span class="tag">Equipment</span>
+      </article>
+      <article class="result">
+        <h3>Powerline safety</h3>
+        <p>Requirements depend on the network, voltage and task. Contact the relevant network operator and follow its current rules before work near electrical conductors.</p>
+        <span class="tag">High risk</span>
+      </article>
+      <article class="result">
+        <h3>Assessment learning</h3>
+        <p>Break questions into instruction words such as identify, describe, explain and compare. Build answers in your own words using evidence and examples.</p>
+        <span class="tag">Training</span>
+      </article>
+    </div>
+  </section>
+</main>
+
+<footer>
+  Arborist Intelligence · Working prototype<br>
+  Verify professional decisions against current local requirements, standards and manufacturer guidance.
+</footer>
+
+<script>
+const treeData = [
+{
+name:"Pōhutukawa", latin:"Metrosideros excelsa",
+region:"New Zealand",
+keywords:"native evergreen coastal red flowers roots",
+identification:"Evergreen tree with thick leaves and distinctive brush-like red flowers.",
+growth:"Can develop a broad crown and substantial surface roots. Form varies with exposure and growing space.",
+soil:"Assess drainage, compaction and available rooting space.",
+season:"Flowering is commonly most visible in late spring and summer in New Zealand, with regional variation.",
+pruning:"Preserve natural crown structure where possible. Plan cuts carefully and avoid unnecessary large wounds.",
+extra:"Consider coastal exposure, root disturbance and local protections before work."
+},
+{
+name:"Tōtara", latin:"Podocarpus totara",
+region:"New Zealand",
+keywords:"native evergreen conifer needle bark",
+identification:"Native evergreen conifer with narrow, stiff leaves and a rugged trunk as it matures.",
+growth:"Can become a large, long-lived tree. Crown form changes with age and competition.",
+soil:"Check drainage, compaction and rooting conditions.",
+season:"Growth responds to local temperature and moisture.",
+pruning:"Plan cuts around branch size and attachment. Avoid removing excessive live foliage.",
+extra:"Mature specimens may have ecological, cultural or legal significance."
+},
+{
+name:"Kōwhai", latin:"Sophora microphylla",
+region:"New Zealand",
+keywords:"native yellow flowers birds divided leaves",
+identification:"Often recognised by divided leaves and yellow flowers. Several Sophora species occur in New Zealand.",
+growth:"Form varies by species and site. Some branches may be slender and flexible.",
+soil:"Check drainage, root competition and the exact species.",
+season:"Flowering often occurs in late winter or spring, depending on species and climate.",
+pruning:"Consider flowering, branch structure and habitat value when planning work.",
+extra:"Confirm the species before applying species-specific advice."
+},
+{
+name:"English oak", latin:"Quercus robur",
+region:"Europe; widely planted elsewhere",
+keywords:"deciduous acorns lobed leaves large shade tree",
+identification:"Deciduous broadleaf tree with rounded leaf lobes and acorns borne on stalks.",
+growth:"Can develop a broad crown, substantial trunk and extensive root system.",
+soil:"Assess drainage, compaction and rooting conditions.",
+season:"Leaf emergence and fall depend on local climate and hemisphere.",
+pruning:"Avoid indiscriminate crown reduction. Consider natural structure and the purpose of each cut.",
+extra:"Inspect major unions and defects carefully; symptoms alone do not establish failure risk."
+},
+{
+name:"Silver birch", latin:"Betula pendula",
+region:"Europe; introduced in many temperate regions",
+keywords:"deciduous white pale bark fine branches",
+identification:"Often has pale bark, fine branchlets and small serrated leaves.",
+growth:"Usually develops a relatively light crown and can be sensitive to site stress.",
+soil:"Check moisture availability, drainage and root disturbance.",
+season:"Seasonal changes vary with climate. Hot or dry conditions can cause stress.",
+pruning:"Avoid assuming all birch species respond equally to heavy pruning.",
+extra:"Confirm species and assess vitality before choosing a treatment."
+},
+{
+name:"Japanese maple", latin:"Acer palmatum",
+region:"East Asia; widely cultivated",
+keywords:"maple red leaves ornamental deciduous",
+identification:"Usually a small ornamental tree with palm-shaped leaves and many cultivated forms.",
+growth:"Size, leaf colour and growth habit vary widely between cultivars.",
+soil:"Often benefits from well-drained soil and protection from harsh site conditions.",
+season:"Autumn colour and leaf emergence depend on cultivar and local climate.",
+pruning:"Respect the natural form. Avoid unnecessary heavy pruning and check cultivar requirements.",
+extra:"Leaf scorch can result from heat, drought, wind or root stress, not only disease."
+},
+{
+name:"London plane", latin:"Platanus × acerifolia",
+region:"Widely planted in temperate cities worldwide",
+keywords:"plane tree mottled peeling bark urban street",
+identification:"Large deciduous tree often recognised by mottled, peeling bark and broad lobed leaves.",
+growth:"Can become a large tree with a broad crown and substantial rooting needs.",
+soil:"Urban soil compaction and restricted rooting space can affect vitality.",
+season:"Leaf timing varies by hemisphere and local climate.",
+pruning:"Plan for mature size and structure; avoid routine severe reduction without a clear objective.",
+extra:"Distinguish symptoms of disease from seasonal leaf drop and environmental stress."
+},
+{
+name:"Giant sequoia", latin:"Sequoiadendron giganteum",
+region:"Native to California; planted in other regions",
+keywords:"giant redwood conifer huge trunk evergreen",
+identification:"Massive evergreen conifer with a thick, fibrous reddish-brown trunk.",
+growth:"Can reach enormous dimensions and requires extensive space over its lifetime.",
+soil:"Site suitability depends on moisture, drainage, climate and root-zone conditions.",
+season:"Growth responds to local climate and moisture availability.",
+pruning:"Major work on large specimens requires specialist planning and appropriate access methods.",
+extra:"Consider the consequences of working at height around massive limbs and trunks."
+},
+{
+name:"Baobab", latin:"Adansonia digitata",
+region:"Africa",
+keywords:"tropical dry climate thick swollen trunk deciduous",
+identification:"Recognisable by its massive swollen trunk and seasonally leafless crown.",
+growth:"Form and dimensions depend on species, climate and age.",
+soil:"Many baobabs are adapted to seasonal dry conditions; local site suitability varies.",
+season:"Leafing and flowering respond to local rainfall and seasonal patterns.",
+pruning:"Avoid applying temperate-tree assumptions. Establish species, season and local guidance first.",
+extra:"Baobab species differ in range and ecology; confirm the species before treatment."
+},
+{
+name:"Rain tree", latin:"Samanea saman",
+region:"Tropical Americas; planted in tropical regions worldwide",
+keywords:"tropical shade tree spreading canopy compound leaves",
+identification:"Often develops a very broad crown with compound leaves and umbrella-like form.",
+growth:"Large spreading crown can create substantial limb and site-management considerations.",
+soil:"Check available rooting space, drainage and local climate.",
+season:"Leaf and flowering patterns respond to tropical rainfall and local conditions.",
+pruning:"Plan for large limbs, branch attachment and the mature crown spread.",
+extra:"Assess structural defects and targets before major limb work."
+}
+];
+
+const problems = [
+{
+name:"Leaf spots",
+keywords:"brown black spots fungal bacteria leaves",
+symptoms:"Brown, black or tan spots, sometimes with yellow margins.",
+causes:"Possible causes include fungal or bacterial infection, chemical injury and environmental stress.",
+next:"Photograph both leaf surfaces, note affected species and distribution, and check recent weather and treatment history."
+},
+{
+name:"Powdery mildew",
+keywords:"white powder fungal leaves fungus",
+symptoms:"White or grey powder-like growth on leaf surfaces or shoots.",
+causes:"Powdery mildew fungi are one possibility; other surface residues can look similar.",
+next:"Check which plant parts are affected, the pattern of spread and the growing conditions before choosing treatment."
+},
+{
+name:"Root rot",
+keywords:"roots decay wet soil wilting fungus",
+symptoms:"Declining vigour, wilting, poor growth or damaged roots.",
+causes:"Waterlogged soil, root injury and several pathogens can produce similar symptoms.",
+next:"Assess drainage, root condition and site history. Suspected root disease on a valuable or hazardous tree needs competent assessment."
+},
+{
+name:"Borer damage",
+keywords:"insect holes sawdust frass bark beetle",
+symptoms:"Small holes, galleries, sawdust-like material or localised dieback.",
+causes:"Several insects can cause holes or frass; some holes have other origins.",
+next:"Photograph holes with a scale, inspect the pattern and record the host species and location. Seek local identification if an invasive pest is possible."
+},
+{
+name:"Leaf yellowing",
+keywords:"yellow leaves chlorosis nutrients iron drought water",
+symptoms:"Leaves become pale or yellow, sometimes between green veins.",
+causes:"Possible causes include nutrient availability, root stress, poor drainage, drought, pests or normal seasonal change.",
+next:"Check whether old or young leaves are affected, soil moisture, recent weather and whether symptoms occur across one or many trees."
+},
+{
+name:"Cankers and bark lesions",
+keywords:"canker bark cracks dead branches fungus",
+symptoms:"Sunken, cracked or discoloured bark and sometimes branch dieback.",
+causes:"Injury, environmental stress and various pathogens may be involved.",
+next:"Photograph the lesion and nearby healthy bark. Do not cut into the tree solely to investigate without a suitable plan."
+},
+{
+name:"Honey fungus",
+keywords:"Armillaria mushroom root decay fungus",
+symptoms:"Some Armillaria infections may involve root or collar decay, decline and fungal growth.",
+causes:"Confirmation requires appropriate evidence; other root problems can look similar.",
+next:"Record the host species, root-collar symptoms and location. Obtain specialist assessment where tree stability could be affected."
+},
+{
+name:"Drought stress",
+keywords:"dry wilting scorch brown edges heat drought",
+symptoms:"Wilting, leaf scorch, premature leaf fall or branch dieback.",
+causes:"Water shortage is possible, but root damage, heat, salinity and disease may cause similar symptoms.",
+next:"Review recent weather, soil moisture, root-zone disturbance and irrigation history."
+}
+];
+
+const results = document.getElementById("results");
+const detail = document.getElementById("detail");
+const search = document.getElementById("search");
+const status = document.getElementById("searchStatus");
+
+function makeCard(title, subtitle, description, buttonText, callback) {
+ const card = document.createElement("article");
+ card.className = "result";
+ const h = document.createElement("h3");
+ h.textContent = title;
+ card.appendChild(h);
+ if (subtitle) {
+   const sub = document.createElement("p");
+   sub.className = "muted";
+   sub.textContent = subtitle;
+   card.appendChild(sub);
+ }
+ const p = document.createElement("p");
+ p.textContent = description;
+ card.appendChild(p);
+ if (buttonText) {
+   const b = document.createElement("button");
+   b.className = "primary";
+   b.textContent = buttonText;
+   b.addEventListener("click", callback);
+   card.appendChild(b);
+ }
+ return card;
+}
+
+function showTree(name) {
+ const t = treeData.find(x => x.name === name);
+ if (!t) return;
+ detail.replaceChildren();
+ const card = document.createElement("article");
+ card.className = "card";
+ const h = document.createElement("h2");
+ h.textContent = t.name;
+ const latin = document.createElement("p");
+ latin.className = "muted";
+ latin.textContent = t.latin + " · " + t.region;
+ card.append(h,latin);
+ [
+  ["Identification",t.identification],
+  ["Growth and form",t.growth],
+  ["Soil and site",t.soil],
+  ["Seasonal considerations",t.season],
+  ["Pruning considerations",t.pruning],
+  ["Additional notes",t.extra]
+ ].forEach(([title,text]) => {
+   const section = document.createElement("div");
+   const sh = document.createElement("h3");
+   sh.textContent = title;
+   const p = document.createElement("p");
+   p.textContent = text;
+   section.append(sh,p);
+   card.appendChild(section);
+ });
+ const close = document.createElement("button");
+ close.className = "secondary";
+ close.textContent = "Close profile";
+ close.onclick = () => detail.replaceChildren();
+ card.appendChild(close);
+ detail.appendChild(card);
+ detail.scrollIntoView({behavior:"smooth",block:"start"});
+}
+
+function showProblem(problem) {
+ detail.replaceChildren();
+ const card = document.createElement("article");
+ card.className = "card";
+ const h = document.createElement("h2");
+ h.textContent = problem.name;
+ card.appendChild(h);
+ [
+  ["Common symptoms",problem.symptoms],
+  ["Possible explanations",problem.causes],
+  ["Suggested next checks",problem.next]
+ ].forEach(([title,text]) => {
+   const sh = document.createElement("h3");
+   sh.textContent = title;
+   const p = document.createElement("p");
+   p.textContent = text;
+   card.append(sh,p);
+ });
+ detail.appendChild(card);
+ detail.scrollIntoView({behavior:"smooth",block:"start"});
+}
+
+function renderTrees(list) {
+ results.replaceChildren();
+ detail.replaceChildren();
+ if (!list.length) {
+   results.appendChild(makeCard("No matches found","","Try another spelling, a botanical name or a symptom.",null,null));
+   return;
+ }
+ list.forEach(t => results.appendChild(
+   makeCard(t.name,t.latin,t.identification,"Read profile",() => showTree(t.name))
+ ));
+}
+
+function renderProblems(list, target) {
+ target.replaceChildren();
+ if (!list.length) {
+   target.appendChild(makeCard("No matching topics","","Try a different keyword or symptom.",null,null));
+   return;
+ }
+ list.forEach(p => target.appendChild(
+   makeCard(p.name,"Pest and disease guide",p.symptoms,"Explore possibilities",() => showProblem(p))
+ ));
+}
+
+function runSearch() {
+ const q = search.value.trim().toLowerCase();
+ const treeMatches = treeData.filter(t =>
+   (t.name+" "+t.latin+" "+t.region+" "+t.keywords+" "+t.identification+" "+t.growth+" "+t.soil+" "+t.pruning)
+   .toLowerCase().includes(q)
+ );
+ const problemMatches = problems.filter(p =>
+   (p.name+" "+p.keywords+" "+p.symptoms+" "+p.causes+" "+p.next)
+   .toLowerCase().includes(q)
+ );
+ renderTrees(q ? treeMatches : treeData);
+ renderProblems(problemMatches, document.getElementById("problemResults"));
+ if (q) {
+   status.textContent = treeMatches.length+" tree match(es); "+problemMatches.length+" pest or disease topic(s).";
+ } else {
+   status.textContent = "Showing all sample tree profiles.";
+ }
+}
+
+function clearSearch() {
+ search.value = "";
+ status.textContent = "";
+ runSearch();
+}
+
+document.querySelectorAll("nav button").forEach(button => {
+ button.addEventListener("click", () => {
+   document.querySelectorAll("nav button").forEach(b => b.classList.remove("active"));
+   document.querySelectorAll(".panel").forEach(p => p.classList.remove("active"));
+   button.classList.add("active");
+   document.getElementById(button.dataset.tab).classList.add("active");
+ });
+});
+
+search.addEventListener("keydown", event => {
+ if (event.key === "Enter") runSearch();
+});
+
+let photoUrl = null;
+const photoInput = document.getElementById("photo");
+const photoPreview = document.getElementById("photoPreview");
+
+photoInput.addEventListener("change", () => {
+ const file = photoInput.files[0];
+ if (photoUrl) URL.revokeObjectURL(photoUrl);
+ photoUrl = null;
+ photoPreview.style.display = "none";
+ if (!file) return;
+ if (!file.type.startsWith("image/")) {
+   document.getElementById("photoStatus").textContent = "Please select an image file.";
+   photoInput.value = "";
+   return;
+ }
+ photoUrl = URL.createObjectURL(file);
+ photoPreview.src = photoUrl;
+ photoPreview.style.display = "block";
+ document.getElementById("photoStatus").textContent =
+   "Photo preview ready. Image analysis is not connected yet.";
+});
+
+function prepareAssessment() {
+ const file = photoInput.files[0];
+ const location = document.getElementById("location").value.trim();
+ const symptoms = document.getElementById("symptoms").value.trim();
+ const type = document.getElementById("photoType").value;
+ const output = document.getElementById("photoStatus");
+ if (!file) {
+   output.textContent = "Please choose a photo first.";
+   return;
+ }
+ output.textContent =
+   "Assessment prepared. Photo type: "+type+". "+
+   "Location: "+(location || "not provided")+". "+
+   "Symptoms: "+(symptoms || "not provided")+". "+
+   "AI analysis is not available until the secure AI service is connected.";
+}
+
+function clearPhoto() {
+ if (photoUrl) URL.revokeObjectURL(photoUrl);
+ photoUrl = null;
+ photoInput.value = "";
+ photoPreview.removeAttribute("src");
+ photoPreview.style.display = "none";
+ document.getElementById("photoStatus").textContent = "Photo removed.";
+}
+
+renderTrees(treeData);
+renderProblems(problems,document.getElementById("problemResults"));
+</script>
 </body>
 </html>
